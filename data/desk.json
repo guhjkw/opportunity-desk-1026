@@ -1,0 +1,38 @@
+{
+  "_note": "Invented general contractor for a demo. Every company, person, email address, phone number and project is made up. Email domains use the reserved .example domain and phone numbers use the 555-01xx range.",
+  "company": { "name": "Cedar Ridge Builders", "short": "Cedar Ridge", "domain": "cedarridge.example", "intake": "projects@cedarridge.example", "town": "Halifax, Nova Scotia", "admin": { "name": "Erin Cormier", "email": "erin@cedarridge.example" } },
+  "now": "2026-10-26 09:00",
+  "rules": { "dayStart": 8, "dayEnd": 17, "remindAfterHours": 4, "autoAssignAfterDays": 1, "followUpDays": 1, "escalateAfterHours": 4, "reportDay": 5, "reportHour": 16, "duplicateWindowDays": 14 },
+  "ams": [
+    { "id": "maya", "name": "Maya Thibodeau", "email": "maya@cedarridge.example", "active": true },
+    { "id": "liam", "name": "Liam MacLeod", "email": "liam@cedarridge.example", "active": true },
+    { "id": "priya", "name": "Priya Desai", "email": "priya@cedarridge.example", "active": true },
+    { "id": "owen", "name": "Owen Fraser", "email": "owen@cedarridge.example", "active": false, "away": "On holiday until 2 Nov" }
+  ],
+  "rotation": { "order": ["maya", "liam", "priya", "owen"], "next": "liam" },
+  "customers": [
+    { "id": "c1", "company": "Harbourview Dental", "domain": "harbourviewdental.example", "am": "liam" },
+    { "id": "c2", "company": "Bedford Montessori School", "domain": "bedfordmontessori.example", "am": "maya" },
+    { "id": "c3", "company": "Maritime Freight Co.", "domain": "maritimefreight.example", "am": "priya" }
+  ],
+  "towns": ["Halifax", "Dartmouth", "Bedford", "Truro", "Lunenburg", "Wolfville", "Sackville", "Antigonish", "Kentville", "Windsor", "Bridgewater"],
+  "projectTypes": {
+    "Commercial fit-out": ["fit-out", "fit out", "retail", "office", "clinic", "operatory", "operatories", "tenant", "restaurant", "cafe"],
+    "Repair": ["leak", "waterproof", "waterproofing", "repair", "storm", "damage", "water coming"],
+    "New build": ["new build", "custom home", "garage", "new home", "build a house"],
+    "Renovation": ["renovation", "renovate", "reno", "kitchen", "bathroom", "main floor", "addition", "basement finish"]
+  },
+  "history": [
+    { "id": "OPP-1001", "title": "Cottage addition, Lunenburg", "prospect": "Claire Wentzell", "email": "claire.wentzell@mail.example", "type": "Renovation", "town": "Lunenburg", "value": 96000, "createdAt": "2026-10-19 10:00", "status": "Quoted", "owner": "priya", "how": "claimed", "claimedAt": "2026-10-19 10:06", "contactedAt": "2026-10-19 13:00", "estimateNo": "EST-2041", "quoteStatus": "Sent", "quoteSentAt": "2026-10-23 11:00" },
+    { "id": "OPP-1002", "title": "Cafe fit-out, Wolfville", "prospect": "Hannah Davison", "email": "hannah@harvestcafe.example", "type": "Commercial fit-out", "town": "Wolfville", "value": 72000, "createdAt": "2026-10-20 09:30", "status": "Won", "owner": "maya", "how": "auto", "claimedAt": "2026-10-21 09:30", "contactedAt": "2026-10-21 11:00", "estimateNo": "EST-2044", "quoteStatus": "Accepted", "quoteSentAt": "2026-10-22 15:00", "wonAt": "2026-10-26 08:40" },
+    { "id": "OPP-1003", "title": "Office refresh, Halifax", "prospect": "Bluenose Insurance", "email": "facilities@bluenoseinsurance.example", "type": "Commercial fit-out", "town": "Halifax", "value": 58000, "createdAt": "2026-10-22 14:00", "status": "Quoted", "owner": "liam", "how": "claimed", "claimedAt": "2026-10-22 14:20", "contactedAt": "2026-10-23 09:00", "estimateNo": "EST-2047", "quoteStatus": "Sent", "quoteSentAt": "2026-10-26 08:50" }
+  ],
+  "inbox": [
+    { "id": "E1", "receivedAt": "2026-10-25 21:14", "forwardedBy": "jake@cedarridge.example", "subject": "Fwd: Kitchen and main floor reno - Dartmouth", "body": "---------- Forwarded message ----------\nFrom: Sarah Boudreau <sarah.boudreau@mail.example>\nHi, we're looking to renovate our kitchen and open up the main floor of our house in Dartmouth. Budget is around $85,000 to $110,000 and we'd like to start in the spring. You can reach me at 902-555-0148.\nThanks, Sarah Boudreau" },
+    { "id": "E2", "receivedAt": "2026-10-26 07:42", "forwardedBy": "nadia@cedarridge.example", "subject": "Fwd: Two new operatories - Harbourview Dental", "body": "---------- Forwarded message ----------\nFrom: Dr. Alan Chiasson <alan@harbourviewdental.example>\nWe need two new operatories built out in our Halifax clinic, ideally over the Christmas closure. Budget about $140,000. Call me at 902-555-0191." },
+    { "id": "E3", "receivedAt": "2026-10-26 08:05", "forwardedBy": "jake@cedarridge.example", "subject": "Fwd: Retail fit-out, two units in Truro", "body": "---------- Forwarded message ----------\nFrom: Megan Hirtle <megan@northshoreproperty.example>\nCompany: Northshore Property Group\nWe have two retail units in Truro that need a full fit-out for new tenants by March. Budget $240,000. Phone 902-555-0177." },
+    { "id": "E4", "receivedAt": "2026-10-26 08:20", "forwardedBy": "tom@cedarridge.example", "subject": "Fwd: Kitchen reno inquiry", "body": "---------- Forwarded message ----------\nFrom: Sarah Boudreau <sarah.boudreau@mail.example>\nFollowing up on my message about the kitchen and main floor renovation in Dartmouth. 902-555-0148" },
+    { "id": "E5", "receivedAt": "2026-10-26 08:31", "forwardedBy": "nadia@cedarridge.example", "subject": "Fwd: Website contact form", "body": "---------- Forwarded message ----------\nFrom: Website form <noreply@cedarridge.example>\nName: Ben Lowe\nEmail: ben.lowe@mail.example\nMessage: Interested in a garage build at some point, can someone call me?" },
+    { "id": "E6", "receivedAt": "2026-10-26 08:47", "forwardedBy": "jake@cedarridge.example", "subject": "Fwd: Basement leak - Bedford", "body": "---------- Forwarded message ----------\nFrom: Raj Patel <raj.patel@mail.example>\nWe have water coming into the basement of our home in Bedford after the last storm. Need waterproofing and repair of the finished wall, budget maybe $15k. 902-555-0123. As soon as possible please." }
+  ]
+}

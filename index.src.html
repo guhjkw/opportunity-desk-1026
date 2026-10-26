@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opportunity desk · Airtable and Make.com sales inquiry demo</title>
+<meta name="description" content="Live demo: forwarded project inquiries become Airtable opportunities, every authorized account manager is notified, the first claim wins with double-claim protection, unclaimed work is reminded and rotated, follow-ups are escalated and a Friday report goes to the team. Invented company, real working logic.">
+<style>
+
+:root{
+  color-scheme:dark;
+  --bg:#06080c;--bg2:#090d14;--s1:#0e131c;--s2:#131a25;--s3:#1a2230;--s4:#242e3e;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);--line3:rgba(255,255,255,.2);
+  --text:#eef2f8;--muted:#9fabbf;--faint:#66728a;
+  --acc:#60a5fa;--acc2:#bfdbfe;--accInk:#0b1d3a;--accSoft:rgba(96,165,250,.12);--accLine:rgba(96,165,250,.4);
+  --warn:#fbbf24;--warnSoft:rgba(251,191,36,.13);--bad:#fb7185;--badSoft:rgba(251,113,133,.14);--info:#a78bfa;--infoSoft:rgba(167,139,250,.14);--gold:#e7b84a;
+  --r:20px;--r2:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1360px;margin:0 auto;padding:0 24px}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:2px;border-radius:8px}
+section[id]{scroll-margin-top:80px}
+.ribbon{background:linear-gradient(90deg,#0b1f3d,#0a1012 35%,#0a1012 65%,#0b1f3d);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ribbon .wrap{display:flex;gap:10px;align-items:center;justify-content:center;padding-top:9px;padding-bottom:9px;flex-wrap:wrap;text-align:center}
+.ribbon b{color:var(--text)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--accSoft);display:inline-block}
+header.nav{position:sticky;top:0;z-index:40;background:rgba(6,9,10,.82);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#93c5fd,#3b82f6 55%,#1d4ed8);display:grid;place-items:center}
+.logo svg{width:18px;height:18px}
+.wm{font-weight:780;letter-spacing:-.02em;font-size:18px;line-height:1}
+.wm small{display:block;font-size:10px;letter-spacing:.26em;color:var(--faint);font-weight:650;margin-top:5px}
+.links{display:flex;gap:24px;font-size:14.5px;color:var(--muted)}
+.links a{text-decoration:none}.links a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:10px 16px;font-weight:700;font-size:14.5px;border:1px solid var(--line2);background:var(--s2);text-decoration:none;white-space:nowrap}
+.btn.pri{background:linear-gradient(180deg,var(--acc2),var(--acc));color:var(--accInk);border-color:transparent;box-shadow:0 10px 30px -12px rgba(96,165,250,.55)}
+.btn.ghost:hover{border-color:var(--line3)}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.btn.xs{padding:4px 9px;font-size:12px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn .n{font-family:var(--mono);font-size:12px;opacity:.8}
+.hero{position:relative;padding:40px 0 16px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:-30% -10% auto -10%;height:720px;background:radial-gradient(620px 360px at 14% 22%,rgba(96,165,250,.16),transparent 70%),radial-gradient(520px 320px at 90% 0%,rgba(96,165,250,.09),transparent 70%);pointer-events:none}
+.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:44px;align-items:end}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--accSoft);color:var(--acc2);font-size:13px;font-weight:650;border:1px solid var(--accLine)}
+h1{font-size:clamp(32px,4.1vw,52px);line-height:1.05;letter-spacing:-.035em;margin:16px 0 14px;font-weight:820}
+h1 .hl{background:linear-gradient(100deg,var(--acc2),var(--acc) 55%,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:17.5px;color:var(--muted);max-width:680px;margin:0}
+.lede b{color:var(--text);font-weight:650}
+.benefits{display:grid;gap:10px}
+.ben{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line)}
+.ben i{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--accSoft);color:var(--acc);font-style:normal;font-size:16px;font-weight:800}
+.ben b{display:block;font-size:15px}
+.ben span{color:var(--muted);font-size:13.5px;line-height:1.45}
+/* the 7 asks */
+.asks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:22px}
+.ask{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(14,21,23,.7);font-size:13px;color:#d4e3df;text-align:left;cursor:pointer}
+.ask:hover{border-color:var(--accLine)}
+.ask i{font-style:normal;color:var(--acc);font-weight:800}
+.ask small{display:block;color:var(--faint);font-size:11.5px;margin-top:2px}
+/* console */
+.console{margin:22px auto 0;border-radius:24px;background:linear-gradient(180deg,#0b1214,#070b0c);border:1px solid var(--line2);box-shadow:0 60px 120px -50px rgba(0,0,0,.95),0 0 0 6px #0a0f10,0 0 0 7px var(--line2);overflow:hidden}
+.cbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02);flex-wrap:wrap}
+.lights{display:flex;gap:6px}.lights i{width:11px;height:11px;border-radius:50%;background:#2f3d40}
+.ctitle{font-weight:750;font-size:14px}
+.ctitle small{color:var(--faint);font-weight:600;margin-left:6px}
+.cbar .sp{flex:1}
+.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.metric{padding:12px 16px;border-right:1px solid var(--line)}
+.metric:last-child{border-right:0}
+.metric b{display:block;font:750 24px/1.1 var(--mono);letter-spacing:-.02em;transition:color .3s}
+.metric span{font-size:12px;color:var(--muted)}
+.metric.ok b{color:var(--acc)}.metric.warn b{color:var(--warn)}.metric.bad b{color:var(--bad)}
+.metric.bump b{animation:bump .5s ease-out}
+@keyframes bump{40%{transform:scale(1.12)}}
+.panel{display:none;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(96,165,250,.035)}
+.panel.show{display:block}
+.panel h5{margin:0 0 10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2)}
+.fg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.fg.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fld{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.fld input,.fld select,.fld textarea,.mini select{width:100%;background:var(--s2);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-size:13.5px;color:var(--text)}
+.fld textarea{min-height:58px;resize:vertical}
+.ticks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:#d4e3df;margin-top:10px}
+.ticks label{display:flex;gap:6px;align-items:center}
+.ticks input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px}
+.err{color:#ffb4c0;font-size:12.5px;min-height:18px;margin-top:8px}
+.sugg{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sugg button{font-size:12px;padding:5px 9px;border-radius:999px;border:1px solid var(--line2);background:var(--s1);color:var(--muted)}
+.sugg button:hover{color:var(--text);border-color:var(--line3)}
+.prow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.cgrid{display:grid;grid-template-columns:272px minmax(0,1fr) 340px;min-height:560px}
+.col{min-width:0;border-right:1px solid var(--line)}
+.col:last-child{border-right:0}
+.chd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:750}
+.chd .mono{letter-spacing:0;text-transform:none}
+.uplist{list-style:none;margin:0;padding:6px;max-height:620px;overflow:auto}
+.up{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;padding:9px 10px;border-radius:12px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s}
+.up:hover{background:var(--s1)}
+.up.sel{background:var(--accSoft);border-color:var(--accLine)}
+.up.running{box-shadow:inset 3px 0 0 var(--acc)}
+.fi{width:30px;height:36px;border-radius:6px;display:grid;place-items:center;background:var(--s3);font:800 8.5px var(--mono);color:var(--muted);letter-spacing:.04em;border:1px solid var(--line2)}
+.fi.pdf{color:#fda4af}.fi.csv{color:#86efac}.fi.jpg,.fi.png,.fi.heic{color:#93c5fd}
+.up .fn{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up .fm{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:800;letter-spacing:.03em;padding:3px 7px;border-radius:999px;background:var(--s3);color:var(--muted);white-space:nowrap}
+.st.filed{background:var(--accSoft);color:var(--acc)}.st.duplicate{background:rgba(255,255,255,.08);color:#d8e2e0}
+.st.wrong_period,.st.unexpected{background:var(--warnSoft);color:var(--warn)}.st.review{background:var(--badSoft);color:#ffb4c0}.st.running{background:var(--infoSoft);color:#bfdbfe}
+/* dashboard matrix */
+.dashwrap{overflow-x:auto}
+table.mx{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.mx th{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);font-weight:750;text-align:center;padding:9px 3px;border-bottom:1px solid var(--line);white-space:nowrap}
+.mx th:first-child{text-align:left;padding-left:14px}
+.mx td{padding:8px 3px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.mx td.stc{text-align:left;padding-right:12px;white-space:nowrap}
+.mx .pl{height:3px;border-radius:3px;background:var(--s3);margin-top:6px;max-width:190px;overflow:hidden}
+.mx .pl i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+.mx td:first-child{text-align:left;padding-left:14px}
+.mx tr{cursor:pointer;transition:background .25s}
+.mx tbody tr:hover{background:rgba(255,255,255,.025)}
+.mx tr.sel{background:var(--accSoft)}
+.mx tr.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{background:rgba(96,165,250,.28)}100%{background:transparent}}
+.mx .cn{font-weight:700;font-size:13px;white-space:nowrap}
+.mx .cc{font-size:11px;color:var(--faint);white-space:nowrap}
+.cell{display:inline-grid;place-items:center;min-width:32px;height:26px;padding:0 5px;border-radius:7px;font:800 11.5px var(--mono)}
+.cell.got{background:var(--accSoft);color:var(--acc)}
+.cell.miss{background:var(--badSoft);color:#ffb4c0}
+.cell.part{background:var(--warnSoft);color:var(--warn)}
+.cell.wrong{background:var(--warnSoft);color:var(--warn);outline:1px dashed rgba(251,191,36,.6)}
+.cell.na{color:#33423f;font-weight:400}
+.pbar{display:flex;align-items:center;gap:7px;justify-content:center}
+.pbar .bar{width:54px;height:6px;border-radius:6px;background:var(--s3);overflow:hidden}
+.pbar .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+.pbar span{font:700 11.5px var(--mono);color:var(--muted)}
+.kb{display:inline-block;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.kb.wait{background:rgba(255,255,255,.07);color:#cbd5d3}
+.kb.ready{background:var(--accSoft);color:var(--acc)}
+.nx{display:block;margin-top:4px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+.nx.today{color:var(--warn)}.nx.done{color:var(--acc)}
+.flag{display:inline-block;margin-left:5px;font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:5px;background:var(--badSoft);color:#ffb4c0;vertical-align:1px}
+.flag.od{background:var(--warnSoft);color:var(--warn)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;padding:10px 14px;font-size:11.5px;color:var(--faint);border-top:1px solid var(--line)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend .cell{min-width:22px;height:18px;font-size:10px}
+/* trace */
+.tr{padding:14px}
+.thead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.thead h4{margin:0;font-size:15px;letter-spacing:-.01em;word-break:break-word}
+.thead .meta{font-size:12px;color:var(--muted);margin-top:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--s3);border:1px solid var(--line);color:#d4e3df}
+.chip b{color:var(--acc2);font-weight:700}
+ol.sv{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.svi{display:grid;grid-template-columns:28px minmax(0,1fr);gap:9px;padding:8px 9px;border-radius:11px;border:1px solid var(--line);background:var(--s1);opacity:.25;transition:opacity .2s,border-color .2s,transform .2s}
+.svi.on{opacity:1}
+.svi.live{border-color:var(--acc);transform:translateX(2px);box-shadow:0 10px 26px -16px rgba(96,165,250,.8)}
+.svi .si{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--s3);font:800 11px var(--mono);color:var(--acc2)}
+.svi.k-karbon .si{background:rgba(96,165,250,.16);color:#bfdbfe}
+.svi.k-drive .si{background:rgba(251,191,36,.12);color:#fde68a}
+.svi.k-review .si,.svi.k-person .si{background:var(--badSoft);color:#ffb4c0}
+.svi b{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+.svi p{margin:2px 0 0;font-size:12.5px;line-height:1.4;color:#dbe7e4;word-break:break-word}
+.svi ul{margin:5px 0 0;padding-left:16px;font-size:12px;color:var(--muted)}
+.conf{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:var(--faint)}
+.conf .bar{flex:1;height:5px;border-radius:5px;background:var(--s3);overflow:hidden}
+.conf .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.conf .bar i.low{background:linear-gradient(90deg,var(--bad),#fda4af)}
+.empty{padding:34px 18px;text-align:center;color:var(--muted);font-size:14px}
+.empty b{color:var(--text)}
+/* lower grid */
+.lgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.lgrid > div{min-width:0}
+.lgrid > div:first-child{border-right:1px solid var(--line)}
+.cp{padding:14px 16px}
+.cph{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.cph h4{margin:0;font-size:18px;letter-spacing:-.01em}
+.cph .meta{font-size:12.5px;color:var(--muted)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.bdg{font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;background:var(--s3);color:var(--muted)}
+.bdg.ok{background:var(--accSoft);color:var(--acc)}.bdg.warn{background:var(--warnSoft);color:var(--warn)}.bdg.bad{background:var(--badSoft);color:#ffb4c0}
+.cl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px}
+.cl td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.cl td:first-child{padding-left:0}
+.cl .src{font-size:10.5px;color:var(--faint);white-space:nowrap}
+.cl .ok{color:var(--acc)}.cl .miss{color:#ffb4c0}.cl .wr{color:var(--warn)}
+.cl .fname{display:block;font-family:var(--mono);font-size:11px;color:var(--faint);word-break:break-all}
+.sub{margin:16px 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:750}
+.tl{display:flex;flex-wrap:wrap;gap:6px}
+.tli{font-size:11.5px;padding:4px 8px;border-radius:8px;background:var(--s2);border:1px solid var(--line);color:#cfdcd9}
+.tli b{font-family:var(--mono);font-weight:700;color:var(--muted);margin-right:4px}
+.tli.call{border-color:rgba(251,113,133,.45)}
+.tli.today{border-color:var(--accLine);background:var(--accSoft)}
+.tli.next{border-style:dashed;color:var(--muted)}
+.mail{border:1px solid var(--line);border-radius:12px;background:var(--s1);overflow:hidden}
+.mail .mh{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);display:grid;gap:2px}
+.mail .mh b{color:var(--text);font-weight:650}
+.mail pre{margin:0;padding:12px;white-space:pre-wrap;font:13px/1.5 var(--sans);color:#dbe7e4;max-height:260px;overflow:auto}
+.kcard{border:1px solid rgba(96,165,250,.3);border-radius:12px;background:linear-gradient(180deg,rgba(96,165,250,.07),var(--s1));padding:11px 12px}
+.kcard .kt{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;font-weight:700;font-size:13px}
+.kcard .km{font-size:12px;color:var(--muted);margin-top:4px}
+.kcard ul{margin:8px 0 0;padding-left:16px;font-size:12px;color:#cfdcd9}
+.files{font:11.5px/1.7 var(--mono);color:#bcd0cb;word-break:break-all}
+.files .new{color:var(--acc2)}
+.files .note{color:var(--warn)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tabs{display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{padding:5px 9px;border-radius:8px;border:1px solid transparent;background:transparent;font-size:12px;font-weight:700;color:var(--muted)}
+.tabs button.on{background:var(--accSoft);color:var(--acc2);border-color:var(--accLine)}
+.tabs button .n{font:600 10.5px var(--mono);color:var(--faint);margin-left:3px}
+.tbody{padding:10px;max-height:560px;overflow:auto}
+.al{border:1px solid var(--line);border-radius:12px;background:var(--s1);padding:10px 11px;margin-bottom:8px}
+.al .ah{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--faint);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.al p{margin:5px 0 0;font-size:13px;line-height:1.4}
+.al.ready{border-color:var(--accLine)}.al.ready .ah span:first-child{color:var(--acc)}
+.al.review{border-color:rgba(251,113,133,.4)}.al.review .ah span:first-child{color:#ffb4c0}
+.al.call{border-color:rgba(251,191,36,.4)}.al.call .ah span:first-child{color:var(--warn)}
+.mini{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:8px}
+.mini select{padding:6px 8px;font-size:12.5px}
+.ob{border:1px solid var(--line);border-radius:12px;background:var(--s1);margin-bottom:8px;overflow:hidden}
+.ob summary{list-style:none;cursor:pointer;padding:9px 11px;display:grid;gap:2px}
+.ob summary::-webkit-details-marker{display:none}
+.ob .oh{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.ob .os{font-size:13px;font-weight:650}
+.ob pre{margin:0;padding:10px 11px;border-top:1px solid var(--line);white-space:pre-wrap;font:12.5px/1.5 var(--sans);color:#dbe7e4}
+.ob .row{padding:0 11px 10px}
+.sent{color:var(--acc)}.wait{color:var(--warn)}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.board h6{margin:0 0 6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.kc{border:1px solid var(--line);border-radius:10px;background:var(--s1);padding:8px 9px;margin-bottom:6px;font-size:12px}
+.kc b{display:block;font-size:12.5px}
+.kc span{color:var(--muted)}
+.kc.moved{border-color:var(--accLine);animation:flash 1.4s ease-out}
+.dtree{font:11.5px/1.75 var(--mono);color:#bcd0cb}
+.dtree .dc{color:var(--text);font-weight:700;margin-top:8px}
+.dtree .dc:first-child{margin-top:0}
+.dtree .df{padding-left:12px;word-break:break-all}
+.dtree .df.new{color:var(--acc2)}
+.log{font-size:12.5px;display:grid;gap:6px}
+.log div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;color:#cfdcd9}
+.log span{font:11px var(--mono);color:var(--faint)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#0f1b1d;border:1px solid var(--accLine);color:var(--text);padding:11px 16px;border-radius:12px;font-size:13.5px;max-width:min(560px,calc(100% - 32px));box-shadow:0 20px 50px -20px #000;transition:opacity .25s,transform .25s;z-index:60}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.breaks{margin-top:16px;padding:14px 16px;border-radius:14px;border:1px dashed var(--line2);background:rgba(14,21,23,.5)}
+.breaks ul{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;display:grid;gap:5px}
+.breaks h4{margin:0 0 8px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+/* sections */
+.blk{padding:68px 0}
+.blk.alt{background:linear-gradient(180deg,var(--bg2),var(--bg));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sec-h{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:24px;flex-wrap:wrap}
+.sec-h h2{font-size:clamp(28px,3.3vw,40px);letter-spacing:-.03em;line-height:1.08;margin:8px 0 0;font-weight:800}
+.sec-h p{color:var(--muted);max-width:560px;margin:0}
+.kick{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);font-weight:750}
+.rules{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.rule{padding:15px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1)}
+.rule label{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:14px;align-items:center}
+.rule label output{font-family:var(--mono);color:var(--acc2)}
+.rule p{margin:6px 0 10px;color:var(--muted);font-size:12.5px;line-height:1.45}
+.rule input[type=text],.rule input[type=number]{width:100%;background:var(--s2);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font:600 14px var(--mono);color:var(--text)}
+.rule input[type=range]{width:100%;accent-color:var(--acc)}
+.switch{position:relative;width:44px;height:26px;flex:none}
+.switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--s4);transition:.2s;pointer-events:none}
+.switch span:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked+span{background:var(--acc)}
+.switch input:checked+span:after{left:21px}
+.rnote{margin-top:12px;color:var(--faint);font-size:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.rerr{color:#ffb4c0;font-size:13px;min-height:18px;margin-top:10px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.step{padding:20px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1)}
+.step .n{font-family:var(--mono);color:var(--acc);font-size:13px;font-weight:700}
+.step h4{margin:8px 0 6px;font-size:17px}
+.step p{margin:0;color:var(--muted);font-size:14px}
+.step.you{border-color:var(--accLine);background:linear-gradient(180deg,rgba(96,165,250,.08),var(--s1))}
+.scen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.sc{padding:18px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1)}
+.sc h4{margin:0;font-size:16px}
+.sc .when{font:12px var(--mono);color:var(--acc2);margin-top:3px}
+.sc .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12.5px}
+.sc .flow span{padding:5px 9px;border-radius:8px;background:var(--s3);border:1px solid var(--line);color:#dbe7e4}
+.sc .flow i{font-style:normal;color:var(--faint)}
+.sc p{margin:10px 0 0;color:var(--muted);font-size:13.5px}
+.hood{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:start}
+.tree{font:13px/1.75 var(--mono);background:#040707;border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px;color:#b6cbc6;overflow-x:auto;white-space:pre}
+.tree b{color:var(--acc2);font-weight:600}
+.hood p{color:var(--muted);margin:0 0 12px}
+.checks{display:flex;gap:10px;flex-wrap:wrap}
+.checks span{padding:8px 12px;border-radius:10px;background:var(--accSoft);color:var(--acc);font-weight:700;font-size:13.5px;border:1px solid rgba(96,165,250,.25)}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tier{position:relative;padding:24px;border-radius:var(--r);border:1px solid var(--line);background:var(--s1);display:flex;flex-direction:column}
+.tier.feat{border-color:rgba(231,184,74,.55);background:linear-gradient(180deg,rgba(231,184,74,.09),var(--s1) 40%);box-shadow:0 30px 70px -40px rgba(231,184,74,.45)}
+.tier .tag{position:absolute;top:-12px;left:24px;background:var(--gold);color:#241a02;font-size:11.5px;font-weight:800;letter-spacing:.08em;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+.tier h4{margin:0;font-size:18px}
+.tier .for{color:var(--muted);font-size:13.5px;margin:4px 0 14px}
+.price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.price b{font-size:38px;letter-spacing:-.03em}
+.price s{color:var(--faint);font-size:15px}
+.price small{color:var(--muted);font-size:13px}
+.tier ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px;font-size:14px;color:#d4e3df}
+.tier li{display:flex;gap:9px}
+.tier li:before{content:"✓";color:var(--acc);font-weight:800}
+.tier li.bonus:before{content:"+";color:var(--gold)}
+.tier .ms{margin-top:auto;padding-top:16px;font-size:12.5px;color:var(--faint);border-top:1px solid var(--line)}
+.tier .ms b{color:var(--muted)}
+.tnote{margin-top:14px;color:var(--faint);font-size:13px}
+.cta{padding:34px;border-radius:24px;background:radial-gradient(500px 240px at 10% 0%,rgba(96,165,250,.18),transparent 70%),linear-gradient(180deg,var(--s2),var(--s1));border:1px solid var(--accLine);display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center}
+.cta h2{margin:0 0 10px;font-size:clamp(26px,3vw,36px);letter-spacing:-.03em;line-height:1.1}
+.cta p{color:var(--muted);margin:0 0 6px}
+.cta .urg{color:var(--warn);font-size:14px;margin-top:12px}
+.need{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.need li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:rgba(6,9,10,.5);border:1px solid var(--line);font-size:14px}
+.need li b{font-family:var(--mono);color:var(--acc)}
+footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+footer .scope{max-width:940px}
+footer b{color:var(--text)}
+@media (max-width:1240px){.cgrid{grid-template-columns:270px minmax(0,1fr)}.cgrid .col.tcol{grid-column:1 / -1;border-top:1px solid var(--line)}.rules{grid-template-columns:repeat(3,minmax(0,1fr))}.asks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .hero .wrap,.hood,.cta,.two,.lgrid,.scen{grid-template-columns:minmax(0,1fr)}
+  .lgrid > div:first-child{border-right:0;border-bottom:1px solid var(--line)}
+  .links{display:none}
+  .cgrid{grid-template-columns:minmax(0,1fr)}
+  .col{border-right:0;border-bottom:1px solid var(--line)}
+  .uplist{max-height:300px}
+  .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .metric:nth-child(3){border-right:0}
+  .metric:nth-child(-n+3){border-bottom:1px solid var(--line)}
+  .steps,.tiers,.rules{grid-template-columns:minmax(0,1fr)}
+  .fg{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .ribbon .long{display:none}
+  .asks{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .ask{padding:8px 9px;font-size:12px}
+  .ask small{display:none}
+  .fg,.fg.three,.board,.mini{grid-template-columns:minmax(0,1fr)}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .metric{border-right:0;border-bottom:1px solid var(--line)}
+  .metric:nth-child(odd){border-right:1px solid var(--line)}
+  .cta{padding:22px}
+  .blk{padding:52px 0}
+  .cbar .btn{padding:7px 10px;font-size:12.5px}
+  .nav .btn{display:none}
+}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.cgrid{grid-template-columns:270px minmax(0,1fr) 350px}
+.ox{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+.ox th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:750;text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ox td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.ox tr{cursor:pointer;transition:background .25s}
+.ox tbody tr:hover{background:rgba(255,255,255,.025)}
+.ox tr.sel{background:var(--accSoft)}
+.ox tr.flash{animation:flash 1.4s ease-out}
+.ox .t1{font-weight:700;font-size:13px}
+.ox td:first-child{min-width:230px}
+.ox .t2{font-size:11.5px;color:var(--faint)}
+.ox .v{font:700 12px var(--mono);white-space:nowrap}
+.ox .tm{font:600 11px var(--mono);color:var(--muted);white-space:nowrap}
+.ox .tm.due{color:var(--warn)}.ox .tm.late{color:#ffb4c0}.ox .tm.okk{color:var(--ok,#34d399)}
+.pill{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap;background:var(--s3);color:var(--muted)}
+.pill.Unclaimed{background:var(--warnSoft);color:var(--warn)}
+.pill.Claimed{background:var(--accSoft);color:var(--acc2)}
+.pill.Assigned{background:rgba(45,212,191,.13);color:#99f6e4}
+.pill.Auto-assigned{background:var(--infoSoft);color:#ddd6fe}
+.pill.Contacted{background:rgba(255,255,255,.08);color:#dbe2ee}
+.pill.Quoted{background:rgba(251,191,36,.10);color:#fde68a}
+.pill.Won{background:rgba(52,211,153,.14);color:#6ee7b7}
+.pill.Lost{background:rgba(255,255,255,.05);color:var(--faint)}
+.ptabs{display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ptabs button{padding:5px 9px;border-radius:8px;border:1px solid transparent;background:transparent;font-size:12px;font-weight:700;color:var(--muted)}
+.ptabs button.on{background:var(--accSoft);color:var(--acc2);border-color:var(--accLine)}
+.ptabs button .n{font:600 10.5px var(--mono);color:var(--faint);margin-left:3px}
+.ptabs button.away{opacity:.6}
+.phone{padding:10px;max-height:520px;overflow:auto}
+.nt{border:1px solid var(--line);border-radius:12px;background:var(--s1);padding:9px 11px;margin-bottom:8px}
+.nt .nh{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--faint);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.nt p{margin:5px 0 0;font-size:13px;line-height:1.4}
+.nt.new{border-color:var(--accLine)}.nt.remind{border-color:rgba(251,191,36,.45)}.nt.overdue,.nt.escalate{border-color:rgba(251,113,133,.45)}
+.nt .row{display:flex;gap:6px;margin-top:8px}
+.race{margin-top:12px;border:1px solid var(--accLine);border-radius:14px;background:linear-gradient(180deg,rgba(96,165,250,.08),var(--s1));padding:12px}
+.race h5{margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc2)}
+.lane{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:start;padding:7px 0;border-top:1px dashed var(--line);font-size:13px}
+.lane:first-of-type{border-top:0}
+.lane b{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.lane .w{color:#6ee7b7;font-weight:700}.lane .l{color:#ffb4c0;font-weight:700}
+.race .naive{margin-top:8px;font-size:12px;color:var(--faint)}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.fields div{background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:7px 9px;min-width:0}
+.fields span{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.fields b{font-size:13px;font-weight:600;word-break:break-word}
+.fields b.miss{color:#ffb4c0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.acts input,.acts select{background:var(--s2);border:1px solid var(--line2);border-radius:10px;padding:7px 9px;font-size:13px;color:var(--text)}
+.acts input{width:120px}
+.ev{font-size:12.5px;display:grid;gap:6px;margin-top:6px}
+.ev div{display:grid;grid-template-columns:118px minmax(0,1fr);gap:8px;color:#d3dbea}
+.ev span{font:11px var(--mono);color:var(--faint)}
+.team{width:100%;border-collapse:collapse;font-size:13px}
+.team td,.team th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.team th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.nextb{font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:var(--accSoft);color:var(--acc2);margin-left:6px}
+.repc{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:10px 0}
+.repc div{background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.repc b{display:block;font:750 20px var(--mono)}
+.repc span{font-size:11px;color:var(--muted)}
+.dbl{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.dbl .box{padding:18px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1)}
+.dbl .box.good{border-color:var(--accLine);background:linear-gradient(180deg,rgba(96,165,250,.07),var(--s1))}
+.dbl h4{margin:0 0 8px;font-size:16px}
+.dbl ol{margin:0;padding-left:18px;color:var(--muted);font-size:14px;display:grid;gap:5px}
+.lg3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.lg3 > div{min-width:0;padding:14px 16px}
+.lg3 > div:first-child{border-right:1px solid var(--line)}
+@media (max-width:1240px){.cgrid{grid-template-columns:250px minmax(0,1fr)}.repc{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.lg3,.dbl{grid-template-columns:minmax(0,1fr)}.lg3 > div:first-child{border-right:0;border-bottom:1px solid var(--line)}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.repc{grid-template-columns:repeat(2,minmax(0,1fr))}.fields{grid-template-columns:minmax(0,1fr)}.ev div{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="ribbon"><div class="wrap"><span class="dot"></span><b>Concept demo</b><span class="long">· Cedar Ridge Builders and everyone in it are invented. The logic is real code you can run.</span><span>· Press Read forwarded emails</span></div></div>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b1d3a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span><span class="wm">Opportunity Desk<small>CEDAR RIDGE BUILDERS · CONCEPT</small></span></a>
+  <nav class="links"><a href="#try">Try it</a><a href="#claims">Double claims</a><a href="#how">How it runs</a><a href="#offer">Pricing</a></nav>
+  <button class="btn pri sm" type="button" data-readall>Read forwarded emails</button>
+</div></header>
+
+<section class="hero" id="top"><div class="wrap">
+  <div>
+    <span class="eyebrow"><span class="dot"></span>Airtable + Make.com · live demo</span>
+    <h1>Every project inquiry claimed, chased and reported. <span class="hl">Never claimed twice, never forgotten.</span></h1>
+    <p class="lede">This is a live tool, not a video. Staff at an invented builder forwarded six inquiries to one address. Press <b>Read forwarded emails</b> and watch each one become an <b>opportunity record</b>, go to <b>all authorized account managers</b> at once, or straight to the right manager for an <b>existing customer</b>. Then make two managers tap <b>Claim</b> at the same moment, move the clock forward, and watch the <b>reminders</b>, <b>rotation</b>, <b>escalations</b> and the <b>Friday report</b>.</p>
+  </div>
+  <div class="benefits">
+    <div class="ben"><i>1</i><div><b>One owner per inquiry, always</b><span>Two taps a few milliseconds apart: the first wins, the second is told who has it.</span></div></div>
+    <div class="ben"><i>⏱</i><div><b>Nothing sits unclaimed</b><span>A reminder after 4 business hours, then the rotation assigns it after 1 business day.</span></div></div>
+    <div class="ben"><i>▤</i><div><b>Everyone sees the scoreboard</b><span>Every Friday at 4 pm: new, claimed versus assigned, quotes sent and projects won.</span></div></div>
+  </div>
+</div>
+<div class="wrap">
+  <div class="asks" id="asks" aria-label="What the job post asked for">
+    <button class="ask" type="button" data-go="inbox"><i>✓</i><span>Email intake creates the record<small>Read forwarded emails</small></span></button>
+    <button class="ask" type="button" data-go="phones"><i>✓</i><span>All authorized managers notified at once<small>The phones panel</small></span></button>
+    <button class="ask" type="button" data-go="claims"><i>✓</i><span>First come, first served, no double claims<small>Two managers tap Claim</small></span></button>
+    <button class="ask" type="button" data-go="team"><i>✓</i><span>Add or remove managers without a rebuild<small>The team list</small></span></button>
+    <button class="ask" type="button" data-go="opps"><i>✓</i><span>Existing customers keep their manager<small>Harbourview Dental</small></span></button>
+    <button class="ask" type="button" data-go="time"><i>✓</i><span>4-hour reminder, 1-day rotation<small>Move the clock</small></span></button>
+    <button class="ask" type="button" data-go="detail"><i>✓</i><span>Follow-up tracking and QuickBooks quote status<small>Opportunity detail</small></span></button>
+    <button class="ask" type="button" data-go="report"><i>✓</i><span>Friday report everyone can see<small>Weekly report</small></span></button>
+  </div>
+</div></section>
+
+<section id="try"><div class="wrap">
+  <div class="console" id="console">
+    <div class="cbar" id="time">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <span class="ctitle">Cedar Ridge · opportunity desk <small class="mono" id="clock"></small></span>
+      <span class="sp"></span>
+      <button class="btn pri sm" type="button" id="readAll" data-readall>Read forwarded emails <span class="n" id="readN">6</span></button>
+      <button class="btn ghost sm" type="button" id="raceBtn">Two managers tap Claim</button>
+      <button class="btn ghost sm" type="button" data-adv="hour">+1 hour</button>
+      <button class="btn ghost sm" type="button" data-adv="bizhours">+4 business hours</button>
+      <button class="btn ghost sm" type="button" data-adv="morning">Next morning</button>
+      <button class="btn ghost sm" type="button" data-adv="friday">Friday 4 pm</button>
+      <button class="btn ghost sm" type="button" id="fwdBtn">Forward your own</button>
+      <button class="btn ghost sm" type="button" id="resetBtn">Reset</button>
+    </div>
+    <div class="metrics" id="metrics"></div>
+
+    <div class="panel" id="fwdPanel">
+      <h5>Forward an inquiry to projects@cedarridge.example</h5>
+      <div class="fg three">
+        <label class="fld">Forwarded by (staff)<select id="fBy"><option>jake@cedarridge.example</option><option>nadia@cedarridge.example</option><option>tom@cedarridge.example</option><option>someone@gmail.com</option></select></label>
+        <label class="fld">Subject<input id="fSubj" value="Fwd: Bathroom renovation in Halifax"></label>
+        <label class="fld">Paste a sample<select id="fSample"><option value="">Choose a sample…</option><option value="full">New prospect with full details</option><option value="existing">Existing customer (Maritime Freight)</option><option value="thin">Missing phone and budget</option><option value="again">The same person again</option></select></label>
+      </div>
+      <label class="fld" style="margin-top:8px">Email text<textarea id="fBody" rows="4">From: Lee Ward &lt;lee.ward@mail.example&gt;
+We'd like our main bathroom renovated in Halifax this winter, budget around $25,000. You can call me at 902-555-0150.</textarea></label>
+      <div class="err" id="fErr" role="alert"></div>
+      <div class="prow"><button class="btn pri sm" type="button" id="fRun">Forward it</button><button class="btn ghost sm" type="button" data-close="fwdPanel">Close</button></div>
+    </div>
+
+    <div class="cgrid">
+      <div class="col" id="inbox">
+        <div class="chd"><span>Intake inbox</span><span class="mono" id="inCount"></span></div>
+        <ul class="uplist" id="mails"></ul>
+      </div>
+      <div class="col" id="opps">
+        <div class="chd"><span>Opportunities · Airtable</span><span class="mono" id="oppCount"></span></div>
+        <div class="dashwrap"><table class="ox" id="ox"></table></div>
+      </div>
+      <div class="col tcol" id="phones">
+        <div class="chd"><span>Phones · notifications</span><span class="mono">tap Claim</span></div>
+        <div class="ptabs" id="ptabs"></div>
+        <div class="phone" id="phone"></div>
+      </div>
+    </div>
+
+    <div class="lg3">
+      <div id="detail"></div>
+      <div><div class="sub" style="margin-top:0">What just happened</div><div id="trace"><div class="empty"><b>Press Read forwarded emails</b> to watch each inquiry go through, or click an email to read just that one.</div></div><div class="sub">Up next</div><div class="ev" id="next"></div></div>
+    </div>
+    <div class="lg3">
+      <div id="team"></div>
+      <div id="report"></div>
+    </div>
+  </div>
+  <div class="breaks">
+    <h4>Try to break it</h4>
+    <ul>
+      <li>Press <b>Two managers tap Claim</b>. They tap 31 ms apart. Only one gets it, and the other is told who did.</li>
+      <li>In the phones panel, try to claim something already taken, or claim as Owen, who is marked away.</li>
+      <li><b>Forward your own</b> from a gmail address (refused), or forward the same person twice (it becomes a note, not a second record).</li>
+      <li>Mark Liam away in the team list, then press <b>Next morning</b>. The rotation skips him.</li>
+      <li>Enter a QuickBooks estimate as "abc". It is refused. Enter 2051 and it is stored as EST-2051.</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="blk" id="claims"><div class="wrap">
+  <div class="sec-h"><div><span class="kick">The question in your post</span><h2>How two managers can never claim the same opportunity.</h2></div><p>Two people tapping Claim in the same second is the moment a simple automation breaks. This is how the build prevents it, and the demo above runs the same rule.</p></div>
+  <div class="dbl">
+    <div class="box"><h4>What goes wrong in a simple build</h4><ol><li>Maya and Priya tap Claim 31 ms apart.</li><li>Make starts two runs at the same time.</li><li>Both runs read the record: "Unclaimed".</li><li>Both write their name. Both get "it's yours". One of them is wrong.</li></ol></div>
+    <div class="box good"><h4>What this build does</h4><ol><li>The Claim link calls one Make scenario with <b>sequential processing</b> on, so requests are handled one at a time, in the order they arrive.</li><li>Each run re-reads the Airtable record and only writes if it is still Unclaimed, bumping a version number.</li><li>The second run sees "Claimed by Maya" and replies "already claimed by Maya at 09:00".</li><li>Everyone else is told it is taken, so nobody calls the client twice.</li></ol></div>
+  </div>
+</div></section>
+
+<section class="blk alt" id="how"><div class="wrap">
+  <div class="sec-h"><div><span class="kick">How it works</span><h2>Four steps. One of them is yours.</h2></div><p>Staff keep forwarding inquiries the way they do today. Everything after that runs on its own and tells you when it needs you.</p></div>
+  <div class="steps">
+    <div class="step you"><span class="n">01 · YOU</span><h4>Forward the inquiry</h4><p>Anyone at the company forwards a new project email to one central address. That is the only change for staff.</p></div>
+    <div class="step"><span class="n">02</span><h4>Record and notify</h4><p>The email is read, an opportunity is created in Airtable, and every authorized account manager gets a Claim link. Existing customers go to their own manager.</p></div>
+    <div class="step"><span class="n">03</span><h4>Claim or rotate</h4><p>First valid claim wins. After 4 business hours everyone is reminded; after 1 business day the rotation assigns it.</p></div>
+    <div class="step"><span class="n">04</span><h4>Chase and report</h4><p>First contact is due within 1 business day, then reminded and escalated. Every Friday the team gets the shared report.</p></div>
+  </div>
+  <div class="scen">
+    <div class="sc"><h4>Scenario 1 · Intake</h4><div class="when">instant, on every forwarded email</div><div class="flow"><span>Gmail or Outlook: new email</span><i>→</i><span>AI step: name, contact, project, town, budget</span><i>→</i><span>Airtable: duplicate and customer check</span><i>→</i><span>Airtable: create opportunity</span><i>→</i><span>Email: Claim link to managers</span></div><p>Missing details are flagged on the record instead of guessed.</p></div>
+    <div class="sc"><h4>Scenario 2 · Claim</h4><div class="when">instant, sequential processing on</div><div class="flow"><span>Webhook: Claim link</span><i>→</i><span>Airtable: re-read record</span><i>→</i><span>Still unclaimed?</span><i>→</i><span>Airtable: owner, time, version</span><i>→</i><span>Email: confirm, tell the others</span></div><p>The authorized list is an Airtable table, so adding someone is one row, not a rebuild.</p></div>
+    <div class="sc"><h4>Scenario 3 · Timers</h4><div class="when">every 15 minutes, business hours</div><div class="flow"><span>Airtable: open opportunities</span><i>→</i><span>4-hour reminder</span><i>→</i><span>1-day rotation</span><i>→</i><span>Follow-up due, then escalate</span></div><p>Business hours and the rotation order are settings in Airtable.</p></div>
+    <div class="sc"><h4>Scenario 4 · Friday report</h4><div class="when">Fridays, 4 pm</div><div class="flow"><span>Airtable: this week's records</span><i>→</i><span>Totals and per-manager table</span><i>→</i><span>Email: shared report link</span></div><p>QuickBooks stays your estimating tool; the record keeps the estimate number and quote status.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="hood"><div class="wrap">
+  <div class="hood">
+    <div>
+      <span class="kick">Under the hood</span>
+      <h2 style="font-size:clamp(26px,3vw,34px);letter-spacing:-.03em;margin:8px 0 14px">One engine. The page and the tests run the same file.</h2>
+      <p>Every record, notification, claim, timer and report on this page comes from <b>src/deskEngine.js</b>. The tests load that exact file, so what you clicked is what was tested. In the delivered build the reading step is an AI module in Make.com and the rest runs as Make.com scenarios on your own Airtable and email.</p>
+      <p>Hand src/ and tests/ to your developer, or never open them.</p>
+      <div class="checks"><span>61 engine checks passing</span><span id="chk2">29 browser checks passing</span><span>0 console errors</span></div>
+    </div>
+<div class="tree"><b>opportunity-desk-1026/</b>
+├── index.html              this page
+├── <b>src/deskEngine.js</b>       the real logic, one file
+├── data/desk.json          invented builder: 4 managers, 6 inquiries
+├── tests/verify.js         61 engine checks (node)
+├── tests/browser-check.py  drives this page in a real browser
+└── README.md</div>
+  </div>
+</div></section>
+
+<section class="blk alt" id="offer"><div class="wrap">
+  <div class="sec-h"><div><span class="kick">Three ways to start</span><h2>Built in your Airtable, Make.com and email accounts.</h2></div><p>Fixed prices with milestones on Upwork. Working prototype within 2 weeks, then 30 days of support after launch.</p></div>
+  <div class="tiers">
+    <div class="tier"><h4>Starter</h4><div class="for">Intake and claiming.</div><div class="price"><b>$1,200</b></div>
+      <ul><li>Forwarded email becomes an Airtable opportunity</li><li>All authorized managers notified at once</li><li>First-come claiming with double-claim protection</li><li>Existing customers routed to their manager</li></ul>
+      <div class="ms"><b>Milestones:</b> intake and records $600, claiming and notifications $600.</div></div>
+    <div class="tier feat"><span class="tag">Best value</span><h4>Core</h4><div class="for">Everything in your post.</div><div class="price"><b>$1,950</b><s>worth $4,000+</s></div>
+      <ul><li>Everything in Starter</li><li>4-hour reminder and 1-day rotation assignment</li><li>Follow-up reminders and admin escalation</li><li>QuickBooks estimate number and quote status</li><li>Friday report everyone can see</li><li>Admin documentation and a full test run</li><li>30 days of post-launch support</li>
+        <li class="bonus">Your team, rotation and customer list loaded in for you</li><li class="bonus">Recorded walkthrough video</li></ul>
+      <div class="ms"><b>Milestones:</b> intake, records and claiming $650 (week 1) · reminders, rotation, follow-ups and QuickBooks fields $800 (week 2) · Friday report, docs and launch $500.</div></div>
+    <div class="tier"><h4>Premium</h4><div class="for">Faster replies, less typing.</div><div class="price"><b>$3,400</b></div>
+      <ul><li>Everything in Core</li><li>AI reading tuned on your own past inquiries</li><li>Claim by text message as well as email</li><li>Quote status pulled from QuickBooks Online automatically</li><li>60 days of support</li></ul>
+      <div class="ms"><b>Milestones:</b> Core first, then each addition as its own milestone.</div></div>
+  </div>
+  <p class="tnote">Airtable, Make.com and AI usage are billed to your own accounts. You own every base, scenario and record.</p>
+</div></section>
+
+<section class="blk"><div class="wrap">
+  <div class="cta">
+    <div>
+      <span class="kick">See your own inquiries</span>
+      <h2>Send me five recent inquiries and your account manager list. I'll run them through this.</h2>
+      <p>Reply to my proposal on Upwork with five forwarded inquiries (names changed if you like), your account managers, your business hours and your existing customers. I'll load them into this demo so you watch your own week run before we talk.</p>
+      <p class="urg">Every week without this, inquiries wait in an inbox while someone decides who takes them.</p>
+    </div>
+    <div>
+      <h3 style="margin:0 0 12px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)">What I need from you to start</h3>
+      <ul class="need">
+        <li><b>1</b>Access to the central inquiry inbox, or a new one we create together</li>
+        <li><b>2</b>An Airtable workspace and a Make.com account in your name (I can set them up with you)</li>
+        <li><b>3</b>Your account managers, business hours and rotation order</li>
+        <li><b>4</b>Your existing customers and who looks after each</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p class="scope"><b>Honest scope.</b> Built from your job post. Cedar Ridge Builders, its staff, customers, inquiries, email addresses and phone numbers are invented, and no real client data is shown. The engine and its 61 passing checks are real, and this page runs on that same engine. The demo reads emails with rules so it needs no API key; the delivered version uses an AI step in Make.com for reading and runs entirely in your own Airtable, Make.com and email accounts, with access you grant during the build. QuickBooks stays your estimating platform; the build records the estimate number and quote status. No prior work for your company is claimed. This link will be taken down about 30 days after it was sent.</p>
+  <p>Built by Taiwo, Pathfinder Automation Solutions.</p>
+</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="src/deskEngine.js"></script>
+<script>
+var FALLBACK = __FALLBACK__;
+(function () {
+  'use strict';
+  var E = window.DeskEngine;
+  var FAST = /[?&]fast\b/.test(location.search) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var STEP = FAST ? 0 : 110, GAP = FAST ? 0 : 380;
+  var RAW = null, S = null, view = {};
+  var SAMPLES = {
+    full: ['Fwd: Bathroom renovation in Halifax', "From: Lee Ward <lee.ward@mail.example>\nWe'd like our main bathroom renovated in Halifax this winter, budget around $25,000. You can call me at 902-555-0150."],
+    existing: ['Fwd: Warehouse office build-out', 'From: Dana Pike <dana.pike@maritimefreight.example>\nWe need a two-room office built inside our Dartmouth warehouse, budget $60,000 to $75,000. Call 902-555-0166.'],
+    thin: ['Fwd: Quote request', 'From: Olivia Smith <olivia.smith@mail.example>\nCould someone get in touch about adding a sunroom to our house?'],
+    again: ['Fwd: Retail units again', 'From: Megan Hirtle <megan@northshoreproperty.example>\nJust checking someone has our Truro retail fit-out request. 902-555-0177']
+  };
+  function $(id) { return document.getElementById(id); }
+  function h(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function opp(id) { return S.opps.filter(function (o) { return o.id === id; })[0] || null; }
+  function amName(id) { if (id === 'admin') return S.company.admin.name; var a = S.ams.filter(function (x) { return x.id === id; })[0]; return a ? a.name : id; }
+  function first(id) { return amName(id).split(' ')[0]; }
+  function pendingMails() { return S.inbox.filter(function (m) { return !S.processed[m.id]; }); }
+  var toastT;
+  function toast(t) { var el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove('show'); }, 4200); }
+
+  function renderMetrics() {
+    var b = E.board(S), w = b.week;
+    var m = [['un', b.unclaimed, 'Unclaimed now', b.unclaimed ? 'warn' : 'ok'], ['od', b.overdue, 'Follow-ups overdue', b.overdue ? 'bad' : 'ok'], ['esc', b.escalations, 'Escalations to Erin', b.escalations ? 'bad' : ''],
+      ['wait', b.waitingEmails, 'Emails waiting', ''], ['q', w.quotes, 'Quotes sent this week', ''], ['won', E.money(w.wonValue), 'Won this week', 'ok']];
+    $('metrics').innerHTML = m.map(function (x) { return '<div class="metric ' + x[3] + '" data-m="' + x[0] + '"><b>' + h(x[1]) + '</b><span>' + x[2] + '</span></div>'; }).join('');
+    $('clock').textContent = E.nice(S.now);
+    var p = pendingMails().length;
+    $('readN').textContent = p;
+    document.querySelectorAll('[data-readall]').forEach(function (x) { x.disabled = view.busy || !p; });
+    document.querySelectorAll('[data-adv],#raceBtn,#fRun').forEach(function (x) { x.disabled = view.busy; });
+  }
+  function renderMails() {
+    $('inCount').textContent = S.inbox.length;
+    $('mails').innerHTML = S.inbox.map(function (m) {
+      var r = S.processed[m.id], running = view.busy && view.mail === m.id;
+      var chip = running ? '<span class="st running">Reading…</span>' : !r ? '<span class="st">Waiting</span>' : r.outcome === 'duplicate' ? '<span class="st duplicate">Duplicate of ' + h(r.opp) + '</span>' : r.outcome === 'existing' ? '<span class="st filed">' + h(r.opp) + ' · to ' + h(first(opp(r.opp).owner)) + '</span>' : '<span class="st filed">' + h(r.opp) + ' created</span>';
+      return '<li class="up' + (view.mail === m.id ? ' sel' : '') + (running ? ' running' : '') + '" data-mail="' + m.id + '" tabindex="0" role="button"><span class="fi pdf">EML</span><div style="min-width:0"><div class="fn">' + h(m.id + ' · ' + m.subject.replace(/^Fwd:\s*/i, '')) + '</div><div class="fm">from ' + h(m.forwardedBy) + '</div><div class="fm">' + h(E.nice(E.pt(m.receivedAt))) + '</div>' + chip + '</div></li>';
+    }).join('');
+  }
+  function when(t) {
+    var d = new Date(t * 60000), n = new Date(S.now * 60000);
+    var same = d.getUTCFullYear() === n.getUTCFullYear() && d.getUTCMonth() === n.getUTCMonth() && d.getUTCDate() === n.getUTCDate();
+    return (same ? 'today ' : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()] + ' ') + E.clock(t);
+  }
+  function timer(o) {
+    var now = S.now;
+    if (o.status === 'Won' || o.status === 'Lost') return '<span class="tm okk">closed</span>';
+    if (o.status === 'Unclaimed') return '<span class="tm due">' + (o.reminded ? 'rotation ' + h(when(o.autoT)) : 'reminder ' + h(when(o.remindT))) + '</span>';
+    if (o.contactedT) return '<span class="tm okk">contacted</span>';
+    return '<span class="tm ' + (o.followUpT < now ? 'late' : 'due') + '">' + (o.followUpT < now ? 'contact late' : 'contact by ' + h(when(o.followUpT))) + '</span>';
+  }
+  function renderOpps() {
+    var list = S.opps.slice().reverse(), now = Date.now();
+    $('oppCount').textContent = list.length + ' records';
+    $('ox').innerHTML = '<thead><tr><th>Opportunity</th><th>Value</th><th>Status</th><th>Owner</th><th>Timer</th><th>Quote</th></tr></thead><tbody>' + list.map(function (o) {
+      var fl = view.flash[o.id] && now - view.flash[o.id] < 1500 ? ' flash' : '';
+      return '<tr data-opp="' + o.id + '" class="' + (view.sel === o.id ? 'sel' : '') + fl + '" tabindex="0"><td><div class="t1">' + h(o.id + ' · ' + o.title) + '</div><div class="t2">' + h(o.prospect) + (o.missing && o.missing.length ? ' · missing ' + h(o.missing.join(', ')) : '') + (o.notes.length ? ' · ' + o.notes.length + ' note' : '') + '</div></td>' +
+        '<td class="v">' + h(o.value ? E.money(o.value) : '?') + '</td><td><span class="pill ' + o.status + '">' + h(o.status) + '</span></td><td>' + h(o.owner ? first(o.owner) + (o.how === 'auto' ? ' (rotation)' : o.how === 'existing' ? ' (customer)' : '') : '·') + '</td><td>' + timer(o) + '</td><td class="tm">' + h(o.estimateNo || '·') + (o.quoteStatus ? '<div class="t2">' + h(o.quoteStatus) + '</div>' : '') + '</td></tr>';
+    }).join('') + '</tbody>';
+  }
+  function people() { return S.ams.map(function (a) { return a.id; }).concat(['admin']); }
+  function renderPhones() {
+    if (people().indexOf(view.phone) < 0) view.phone = people()[0];
+    $('ptabs').innerHTML = people().map(function (id) {
+      var a = S.ams.filter(function (x) { return x.id === id; })[0], n = S.notices.filter(function (x) { return x.to === id; }).length;
+      return '<button type="button" data-phone="' + id + '" class="' + (view.phone === id ? 'on' : '') + (a && !a.active ? ' away' : '') + '">' + h(id === 'admin' ? 'Erin (admin)' : first(id) + (a && !a.active ? ' (away)' : '')) + '<span class="n">' + n + '</span></button>';
+    }).join('');
+    var me = view.phone, mine = S.notices.filter(function (n) { return n.to === me; }).slice().reverse();
+    var a = S.ams.filter(function (x) { return x.id === me; })[0];
+    $('phone').innerHTML = (a && !a.active ? '<div class="nt"><p>' + h(a.name + ' is marked away' + (a.away ? ': ' + a.away : '') + '. No new-opportunity alerts and no claiming until back.') + '</p></div>' : '') +
+      (mine.length ? mine.map(function (n) {
+        var o = n.opp ? opp(n.opp) : null;
+        var canClaim = o && o.status === 'Unclaimed' && (n.kind === 'new' || n.kind === 'remind') && me !== 'admin';
+        return '<div class="nt ' + n.kind + '"><div class="nh"><span>' + h({ new: 'New opportunity', remind: 'Reminder', taken: 'Taken', assigned: 'Yours', overdue: 'Follow-up overdue', escalate: 'Escalation', report: 'Weekly report', info: 'Info' }[n.kind] || n.kind) + '</span><span>' + h(E.nice(n.at)) + '</span></div><p>' + h(n.text) + '</p>' +
+          (canClaim ? '<div class="row"><button class="btn pri xs" type="button" data-claim="' + o.id + '" data-am="' + me + '">Claim ' + h(o.id) + '</button></div>' : o && n.kind === 'new' && o.status !== 'Unclaimed' ? '<div class="row"><span class="t2" style="font-size:12px;color:var(--faint)">' + h(o.owner === me ? 'You have it.' : 'Taken by ' + amName(o.owner) + '.') + '</span></div>' : '') + '</div>';
+      }).join('') : '<div class="empty">No notifications yet for ' + h(amName(me)) + '.</div>');
+  }
+  function renderDetail() {
+    var o = opp(view.sel) || S.opps[S.opps.length - 1];
+    if (!o) { $('detail').innerHTML = '<div class="empty">No opportunities yet.</div>'; return; }
+    view.sel = o.id;
+    function fld(label, v, miss) { return '<div><span>' + label + '</span><b class="' + (miss ? 'miss' : '') + '">' + h(v == null || v === '' ? 'missing' : v) + '</b></div>'; }
+    var claimBtns = o.status === 'Unclaimed' ? S.ams.filter(function (a) { return a.active; }).map(function (a) { return '<button class="btn ghost xs" type="button" data-claim="' + o.id + '" data-am="' + a.id + '">Claim as ' + h(a.name.split(' ')[0]) + '</button>'; }).join('') : '';
+    $('detail').innerHTML = '<div class="cph"><div><h4>' + h(o.id + ' · ' + o.title) + '</h4><div class="meta">' + h((o.forwardedBy ? 'Forwarded by ' + o.forwardedBy + ' · ' : '') + 'Created ' + E.nice(o.createdT)) + '</div></div><span class="pill ' + o.status + '">' + h(o.status) + '</span></div>' +
+      '<div class="fields">' + fld('Prospect', o.prospect) + fld('Email', o.email, !o.email) + fld('Phone', o.phone, !o.phone) + fld('Project', o.type, !o.type) + fld('Town', o.town, !o.town) + fld('Budget', o.budget, !o.budget) +
+      fld('Owner', o.owner ? amName(o.owner) + (o.how === 'auto' ? ' (rotation)' : o.how === 'existing' ? ' (existing customer)' : ' (claimed)') : 'nobody yet') + fld('Claimed or assigned', o.claimedT ? E.nice(o.claimedT) : '·') + fld('First contact', o.contactedT ? E.nice(o.contactedT) : o.followUpT ? 'due ' + E.nice(o.followUpT) : '·') + '</div>' +
+      (o.notes.length ? '<div class="sub">Notes</div><div class="ev">' + o.notes.map(function (n) { return '<div><span>' + h(E.nice(n.at)) + '</span>' + h(n.text) + '</div>'; }).join('') + '</div>' : '') +
+      '<div class="acts">' + claimBtns + (o.owner && !o.contactedT ? '<button class="btn ghost xs" type="button" data-contact="' + o.id + '">Log first contact</button>' : '') +
+      (o.owner ? '<span style="font-size:12px;color:var(--faint)">QuickBooks estimate</span><input id="qNo" placeholder="EST-2051" value="' + h(o.estimateNo || '') + '" aria-label="Estimate number"><select id="qSt" aria-label="Quote status">' + E.QUOTE.map(function (q) { return '<option' + (o.quoteStatus === q ? ' selected' : '') + '>' + q + '</option>'; }).join('') + '</select><button class="btn pri xs" type="button" data-quote="' + o.id + '">Save</button>' : '') + '</div><div class="err" id="dErr" role="alert"></div>';
+  }
+  function renderTrace() {
+    var t = view.trace;
+    if (!t) return;
+    if (t.kind === 'race') {
+      $('trace').innerHTML = '<div class="race"><h5>' + h(t.title) + '</h5>' + t.race.results.map(function (r) { return '<div class="lane"><b>+' + r.ms + ' ms</b><div><span class="' + (r.ok ? 'w' : 'l') + '">' + h(r.name) + (r.ok ? ' wins' : ' refused') + '</span><br>' + h(r.message) + '</div></div>'; }).join('') +
+        '<div class="naive">Handled one at a time, in arrival order, each run re-reading the record first. Without that, both runs would have read "Unclaimed" and both managers would have been told it was theirs.</div></div>';
+      return;
+    }
+    var n = t.shown == null ? t.steps.length : t.shown;
+    $('trace').innerHTML = '<div class="thead"><div style="min-width:0"><h4>' + h(t.title) + '</h4><div class="meta">' + h(t.meta || '') + '</div></div>' + (t.label ? '<span class="st ' + (n >= t.steps.length ? 'filed' : 'running') + '">' + h(n >= t.steps.length ? t.label : 'Running…') + '</span>' : '') + '</div>' +
+      '<ol class="sv">' + t.steps.map(function (s, i) {
+        var extra = s.missing ? '<ul><li>Found: ' + h(Object.keys(s.fields).filter(function (k) { return s.fields[k]; }).join(', ')) + '</li>' + (s.missing.length ? '<li>Missing: ' + h(s.missing.join(', ')) + '</li>' : '') + '</ul>' : '';
+        return '<li class="svi k-' + s.name.toLowerCase() + (i < n ? ' on' : '') + (i === n - 1 && n < t.steps.length ? ' live' : '') + '"><span class="si">' + h(s.name.slice(0, 2).toUpperCase()) + '</span><div><b>' + h(s.name) + '</b><p>' + h(s.out) + '</p>' + extra + '</div></li>';
+      }).join('') + '</ol>';
+  }
+  function renderNext() {
+    var up = E.upcoming(S, 6);
+    $('next').innerHTML = up.length ? up.map(function (e) { return '<div><span>' + h(e.when) + '</span>' + h({ remind: 'Reminder to all managers', auto: 'Rotation assigns', overdue: 'Follow-up overdue reminder', escalate: 'Escalation to Erin', report: 'Friday report to the team' }[e.kind] + (e.opp ? ': ' + e.opp : '')) + '</div>'; }).join('') : '<div><span>·</span>Nothing scheduled</div>';
+  }
+  function renderTeam() {
+    var order = S.rotation.order;
+    $('team').innerHTML = '<div class="sub" style="margin-top:0">Authorized account managers · rotation order</div><table class="team"><thead><tr><th>#</th><th>Name</th><th>Status</th><th></th></tr></thead><tbody>' + order.map(function (id, i) {
+      var a = S.ams.filter(function (x) { return x.id === id; })[0];
+      if (!a) return '';
+      return '<tr><td class="mono">' + (i + 1) + '</td><td>' + h(a.name) + (S.rotation.next === id ? '<span class="nextb">next in rotation</span>' : '') + '<div class="t2" style="font-size:11.5px;color:var(--faint)">' + h(a.email) + '</div></td>' +
+        '<td><button class="btn ghost xs" type="button" data-toggle="' + id + '">' + (a.active ? 'Active · mark away' : 'Away · mark back') + '</button></td><td><button class="btn ghost xs" type="button" data-remove="' + id + '">Remove</button></td></tr>';
+    }).join('') + '</tbody></table>' +
+      '<div class="acts"><input id="tName" placeholder="First and last name" style="width:170px" aria-label="Name"><input id="tEmail" placeholder="email@cedarridge.example" style="width:200px" aria-label="Email"><button class="btn pri xs" type="button" id="tAdd">Add manager</button></div><div class="err" id="tErr" role="alert"></div>';
+  }
+  function renderReport() {
+    var sent = S.reports[S.reports.length - 1], rep = sent && sent.at === S.now ? sent : E.weeklyReport(S, S.now);
+    var title = sent && sent.at === S.now ? 'Friday report sent ' + E.nice(sent.at) : 'This week so far (the report goes out Friday 4 pm)';
+    $('report').innerHTML = '<div class="sub" style="margin-top:0">' + h(title) + '</div><div class="repc"><div><b>' + rep.created + '</b><span>New</span></div><div><b>' + rep.claimed + '</b><span>Claimed</span></div><div><b>' + rep.auto + '</b><span>Rotation</span></div><div><b>' + rep.existing + '</b><span>Existing</span></div><div><b>' + rep.quotes + '</b><span>Quotes sent</span></div><div><b>' + rep.won + '</b><span>Won</span></div></div>' +
+      '<table class="team"><thead><tr><th>Manager</th><th>Claimed</th><th>Rotation</th><th>Customer</th><th>Quotes</th><th>Won</th><th>Contact on time</th></tr></thead><tbody>' + rep.rows.map(function (r) { return '<tr><td>' + h(r.name) + '</td><td class="mono">' + r.claimed + '</td><td class="mono">' + r.auto + '</td><td class="mono">' + r.existing + '</td><td class="mono">' + r.quotes + '</td><td class="mono">' + r.won + (r.wonValue ? ' · ' + h(E.money(r.wonValue)) : '') + '</td><td class="mono">' + (r.owned ? r.onTime + ' of ' + r.owned : '·') + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+  function renderAll() { renderMetrics(); renderMails(); renderOpps(); renderPhones(); renderDetail(); renderNext(); renderTeam(); renderReport(); renderTrace(); }
+
+  function play(t, done) {
+    view.trace = t;
+    if (FAST) { t.shown = null; renderTrace(); done && done(); return; }
+    var i = 0;
+    (function tick() { i++; t.shown = i; renderTrace(); if (i < t.steps.length) setTimeout(tick, STEP); else { t.shown = null; done && done(); } })();
+  }
+  function traceOf(r, m) { return { kind: 'mail', title: m.subject.replace(/^Fwd:\s*/i, ''), meta: m.id + ' · forwarded by ' + m.forwardedBy, steps: r.trace, label: r.outcome === 'duplicate' ? 'Duplicate of ' + r.opp : r.outcome === 'existing' ? r.opp + ' to ' + first(opp(r.opp).owner) : r.opp + ' created' }; }
+  function runMails(list, done) {
+    if (!list.length) { view.busy = false; renderAll(); done && done(); return; }
+    view.busy = true;
+    var m = list.shift(), r = E.intake(S, m.id);
+    view.mail = m.id; view.sel = r.opp; view.flash[r.opp] = Date.now();
+    renderMetrics(); renderMails();
+    play(traceOf(r, m), function () { renderAll(); if (FAST) runMails(list, done); else setTimeout(function () { runMails(list, done); }, GAP); });
+  }
+  function readAll() { if (view.busy) return; var p = pendingMails(), n = p.length; if (!n) { toast('Nothing waiting. Every email has been read once, and only once.'); return; } runMails(p.slice(), function () { toast(n + ' email' + (n > 1 ? 's' : '') + ' read: ' + S.opps.filter(function (o) { return o.status === 'Unclaimed'; }).length + ' opportunities waiting for a claim.'); }); }
+  function race() {
+    if (view.busy) return;
+    if (pendingMails().length) { E.intakeAll(S); }
+    var open = S.opps.filter(function (o) { return o.status === 'Unclaimed'; }).sort(function (a, b) { return (b.value || 0) - (a.value || 0); })[0];
+    var who = S.ams.filter(function (a) { return a.active; });
+    if (!open) { toast('Nothing is unclaimed right now. Forward a new inquiry or press Reset.'); renderAll(); return; }
+    if (who.length < 2) { toast('Mark at least two managers active to see a race.'); return; }
+    var a = who[0].id, b = who[who.length > 2 ? 2 : 1].id;
+    var res = E.claimRace(S, open.id, [{ am: b, ms: 31 }, { am: a, ms: 0 }]);
+    view.sel = open.id; view.flash[open.id] = Date.now(); view.phone = b;
+    view.trace = { kind: 'race', title: 'Two taps on ' + open.id + ' (' + E.money(open.value) + ')', race: res };
+    renderAll();
+    toast(first(res.winner) + ' got ' + open.id + '. ' + first(b === res.winner ? a : b) + ' was told it was already taken.');
+  }
+  function advance(kind) {
+    if (view.busy) return;
+    if (pendingMails().length) E.intakeAll(S);
+    var r = E.advance(S, kind);
+    if (!r.ok) return;
+    view.trace = { kind: 'time', title: 'Clock moved to ' + E.nice(r.to), meta: r.fired.length ? r.fired.length + ' thing' + (r.fired.length > 1 ? 's' : '') + ' happened on their own' : 'Nothing was due', steps: r.fired.length ? r.fired.map(function (f) { return { name: { remind: 'Reminder', auto: 'Rotation', overdue: 'Overdue', escalate: 'Escalate', report: 'Report' }[f.kind], out: E.nice(f.t) + ': ' + f.text }; }) : [{ name: 'Quiet', out: 'No reminders, assignments or escalations were due in that time' }], label: 'Done' };
+    r.fired.forEach(function (f) { if (f.opp) view.flash[f.opp] = Date.now(); });
+    renderAll();
+  }
+  function forward() {
+    if (view.busy) return;
+    var r = E.forward(S, { forwardedBy: $('fBy').value, subject: $('fSubj').value, body: $('fBody').value });
+    if (!r.ok) { $('fErr').innerHTML = r.problems.map(h).join('<br>'); return; }
+    $('fErr').textContent = '';
+    view.mail = r.email.id; view.sel = r.result.opp; view.flash[r.result.opp] = Date.now();
+    play(traceOf(r.result, r.email), renderAll);
+    renderMails();
+  }
+  function reset() {
+    S = E.newState(E.prepare(RAW).data);
+    view = { sel: null, phone: 'maya', trace: null, busy: false, flash: {}, mail: null };
+    $('fwdPanel').classList.remove('show'); $('fErr').textContent = '';
+    $('trace').innerHTML = '<div class="empty"><b>Press Read forwarded emails</b> to watch each inquiry go through, or click an email to read just that one.</div>';
+    renderAll();
+  }
+  function wire() {
+    document.querySelectorAll('[data-readall]').forEach(function (b) { b.addEventListener('click', function () { if (b.closest('header')) $('try').scrollIntoView({ behavior: FAST ? 'auto' : 'smooth' }); readAll(); }); });
+    $('raceBtn').addEventListener('click', race);
+    document.querySelectorAll('[data-adv]').forEach(function (b) { b.addEventListener('click', function () { advance(b.getAttribute('data-adv')); }); });
+    $('fwdBtn').addEventListener('click', function () { $('fwdPanel').classList.toggle('show'); });
+    document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { $(b.getAttribute('data-close')).classList.remove('show'); }); });
+    $('fRun').addEventListener('click', forward);
+    $('fSample').addEventListener('change', function () { var s = SAMPLES[this.value]; if (s) { $('fSubj').value = s[0]; $('fBody').value = s[1]; } });
+    $('resetBtn').addEventListener('click', function () { if (!view.busy) { reset(); toast('Back to Monday 9:00 with six forwarded emails waiting.'); } });
+    $('mails').addEventListener('click', function (e) {
+      var li = e.target.closest('[data-mail]'); if (!li || view.busy) return;
+      var id = li.getAttribute('data-mail'), m = S.inbox.filter(function (x) { return x.id === id; })[0], r = S.processed[id];
+      if (!r) { runMails([m]); return; }
+      view.mail = id; view.sel = r.opp; view.trace = traceOf(r, m); renderAll();
+    });
+    $('ox').addEventListener('click', function (e) { var tr = e.target.closest('[data-opp]'); if (!tr) return; view.sel = tr.getAttribute('data-opp'); renderOpps(); renderDetail(); });
+    $('ptabs').addEventListener('click', function (e) { var b = e.target.closest('[data-phone]'); if (!b) return; view.phone = b.getAttribute('data-phone'); renderPhones(); });
+    document.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-claim]');
+      if (c) { var r = E.claim(S, c.getAttribute('data-claim'), c.getAttribute('data-am')); view.sel = c.getAttribute('data-claim'); view.flash[view.sel] = Date.now(); renderAll(); toast(r.ok ? r.message : r.problems[0]); return; }
+      var k = e.target.closest('[data-contact]');
+      if (k) { var rc = E.logContact(S, k.getAttribute('data-contact')); renderAll(); toast(rc.ok ? 'First contact logged ' + (rc.onTime ? 'on time.' : 'late.') : rc.problems[0]); return; }
+      var q = e.target.closest('[data-quote]');
+      if (q) { var rq = E.setQuote(S, q.getAttribute('data-quote'), $('qNo').value, $('qSt').value); if (!rq.ok) { $('dErr').innerHTML = rq.problems.map(h).join('<br>'); return; } renderAll(); toast(rq.opp.id + ': ' + rq.opp.estimateNo + ' ' + rq.opp.quoteStatus.toLowerCase() + '.'); return; }
+      var t = e.target.closest('[data-toggle]');
+      if (t) { var a = S.ams.filter(function (x) { return x.id === t.getAttribute('data-toggle'); })[0]; E.setActive(S, a.id, !a.active); renderAll(); toast(a.name + (a.active ? ' is back.' : ' marked away: no alerts, no claiming, skipped by the rotation.')); return; }
+      var rm = e.target.closest('[data-remove]');
+      if (rm) { var rr = E.removeAm(S, rm.getAttribute('data-remove')); if (!rr.ok) { $('tErr').textContent = rr.problems[0]; return; } renderAll(); toast(rr.removed + ' removed from the list and the rotation.'); return; }
+      if (e.target.id === 'tAdd') { var ra = E.addAm(S, { name: $('tName').value, email: $('tEmail').value }); if (!ra.ok) { $('tErr').innerHTML = ra.problems.map(h).join('<br>'); return; } renderAll(); toast(ra.am.name + ' added: notified from now on and in the rotation.'); return; }
+    });
+    $('asks').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-go]'); if (!b) return;
+      var el = $(b.getAttribute('data-go')); if (el) el.scrollIntoView({ behavior: FAST ? 'auto' : 'smooth', block: 'center' });
+    });
+  }
+  function init(raw) { RAW = raw; wire(); reset(); window.__demo = { state: function () { return S; }, engine: E }; }
+  if (location.protocol === 'file:') init(FALLBACK);
+  else fetch('data/desk.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('no data'); return r.json(); }).then(init).catch(function () { init(FALLBACK); });
+})();
+</script>
+</body>
+</html>
